@@ -1,0 +1,27 @@
+{
+    "name": "@css-eval/cssbattle-scraper",
+    "version": "0.0.1",
+    "type": "module",
+    "description": "CSSBattle scraper for collecting challenge data",
+    "private": true,
+    "dependencies": {
+        "camoufox-js": "^0.8.3",
+        "crawlee": "^3.0.0",
+        "playwright": "*"
+    },
+    "devDependencies": {
+        "@apify/tsconfig": "^0.1.0",
+        "@types/node": "^24.0.0",
+        "tsx": "^4.4.0",
+        "typescript": "~5.9.0"
+    },
+    "scripts": {
+        "start": "pnpm run start:dev",
+        "start:prod": "node dist/main.js",
+        "start:dev": "tsx src/main.ts",
+        "build": "tsc",
+        "test": "echo \"Error: oops, the actor has no tests yet, sad!\" && exit 1"
+    },
+    "author": "It's not you it's me",
+    "license": "ISC"
+}

@@ -6,7 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "scraper": "pnpm --filter @css-eval/cssbattle-scraper start",
+    "scraper:dev": "pnpm --filter @css-eval/cssbattle-scraper start:dev",
+    "scraper:build": "pnpm --filter @css-eval/cssbattle-scraper build",
+    "scraper:install": "pnpm exec playwright install --with-deps"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.1",
@@ -15,7 +19,8 @@
     "next": "16.0.6",
     "react": "19.2.0",
     "react-dom": "19.2.0",
-    "tailwind-merge": "^3.4.0"
+    "tailwind-merge": "^3.4.0",
+    "zod": "^4.1.13"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
