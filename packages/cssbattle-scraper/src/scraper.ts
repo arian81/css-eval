@@ -51,7 +51,7 @@ export const crawler = new PlaywrightCrawler({
         const challengeId = request.url.split("/play/")[1];
         const { month, year } = request.userData;
         const title = await page.locator(".level").textContent()
-  
+
         try {
           await page.waitForSelector("img.levelpage__target", { timeout: 5000 });
         } catch {
@@ -74,7 +74,7 @@ export const crawler = new PlaywrightCrawler({
           src: await locator.getAttribute("src"),
           srcset: await locator.getAttribute("srcset"),
         };
-  
+
         let imageFile: string | null = null;
         if (imageData.src) {
           try {
@@ -82,7 +82,7 @@ export const crawler = new PlaywrightCrawler({
             const imageUrl = imageData.srcset
               ? imageData.srcset.split(" ")[0]
               : imageData.src;
-  
+
             const paddedMonth = String(month).padStart(2, "0");
             imageFile = `${year}-${paddedMonth}_${challengeId}`;
             const response = await fetch(imageUrl);
@@ -102,9 +102,9 @@ export const crawler = new PlaywrightCrawler({
             imageFile = null;
           }
         }
-  
-        
-  
+
+
+
         await dataset.pushData({
           challengeId,
           name: title ?? "Name not found",
@@ -114,7 +114,7 @@ export const crawler = new PlaywrightCrawler({
           imageUrl: imageData.src,
           imageFile,
         });
-  
+
         log.debug(request.url);
       } else {
         log.error(
@@ -134,21 +134,21 @@ export const crawler = new PlaywrightCrawler({
       }),
     },
   });
-  
+
   export const generateUrls = () => {
     const urls: MonthlyChallengePageURL[] = [];
-    const startYear = 2025;
+    const startYear = 2023;
     const startMonth = 6; // June 2023 - first daily challenges
-  
+
     // Get current date to set end boundary
     const now = new Date();
     const endYear = now.getFullYear();
     const endMonth = now.getMonth() + 1; // JavaScript months are 0-indexed
-  
+
     for (let year = startYear; year <= endYear; year++) {
       const monthStart = year === startYear ? startMonth : 1;
       const monthEnd = year === endYear ? endMonth : 12;
-  
+
       for (let month = monthStart; month <= monthEnd; month++) {
         const url = new URL("https://cssbattle.dev/daily");
         url.searchParams.set("month", String(month));
@@ -160,6 +160,6 @@ export const crawler = new PlaywrightCrawler({
         });
       }
     }
-  
+
     return urls;
   }
