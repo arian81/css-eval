@@ -1,7 +1,7 @@
 import { Dataset } from "crawlee";
 import fs from "fs";
 import { crawler, generateUrls } from "./scraper.js";
-import { challegeSchema, Challenge } from "./types.js";
+import { challegeSchema } from "./types.js";
 
 const urls = generateUrls();
 await crawler.run(urls);
