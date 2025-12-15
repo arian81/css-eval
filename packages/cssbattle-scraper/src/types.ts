@@ -37,3 +37,5 @@ export const challegeSchema = z.object({
   imageUrl: z.string().nullable(),
   imageFile: z.string().nullable(),
 });
+
+export type ChallengesDictionary = Record<string, Challenge>;
