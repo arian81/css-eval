@@ -1,7 +1,5 @@
-"use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { redirect,  } from "next/navigation";
 import data from "@/data/challenges.json";
 import type { ChallengesDictionary } from "@packages/cssbattle-scraper/src/types";
 
@@ -9,13 +7,12 @@ const challenges: ChallengesDictionary = data;
 const challengeIds = Object.keys(challenges);
 
 export default function Page() {
-  const router = useRouter();
+  // const router = useRouter();
+  // Server only component, so no useEffect
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const randomId = challengeIds[Math.floor(Math.random() * challengeIds.length)];
 
-  useEffect(() => {
-    const randomId =
-      challengeIds[Math.floor(Math.random() * challengeIds.length)];
-    router.replace(`/challenge/${randomId}`);
-  }, [router]);
+  redirect(`/challenge/${randomId}`);
 
-  return null;
+  return <div></div>;
 }
