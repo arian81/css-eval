@@ -34,25 +34,31 @@ import {
   IconPlayerPlay,
   IconRefresh,
   IconPlus,
+  IconScale,
 } from "@tabler/icons-react";
-import { IsolatedContent } from "@/components/isolated-content";
+import { IframePreview, type IframePreviewHandle } from "@/components/iframe-preview";
+import { compareIframeToImage, type CompareResult } from "@/lib/image-compare";
 
 
 interface ChallengeClientProps {
   challenge: Challenge;
+  targetImageUrl: string;
   children: React.ReactNode;
 }
 
-export function ChallengeClient({ challenge, children }: ChallengeClientProps) {
+export function ChallengeClient({ challenge, targetImageUrl, children }: ChallengeClientProps) {
   const router = useRouter();
-  
+
   const [selectedModels, setSelectedModels] = React.useState<SupportedModel[]>([]);
   const [outputs, setOutputs] = React.useState<Record<string, string>>({});
   const [errors, setErrors] = React.useState<Record<string, string>>({});
   const [showCode, setShowCode] = React.useState<Record<string, boolean>>({});
+  const [scores, setScores] = React.useState<Record<string, CompareResult>>({});
   const [isLoading, setIsLoading] = React.useState(false);
   const [mounted, setMounted] = React.useState(false);
   const [comboboxOpen, setComboboxOpen] = React.useState(false);
+
+  const iframeRefs = React.useRef<Record<string, IframePreviewHandle | null>>({});
 
   React.useEffect(() => {
     setMounted(true);
@@ -78,6 +84,35 @@ export function ChallengeClient({ challenge, children }: ChallengeClientProps) {
       delete next[model];
       return next;
     });
+    setScores((prev) => {
+      const next = { ...prev };
+      delete next[model];
+      return next;
+    });
+    delete iframeRefs.current[model];
+  };
+
+  const compareModel = async (modelId: string) => {
+    const handle = iframeRefs.current[modelId];
+    if (!handle) return;
+
+    const iframe = handle.getIframe();
+    if (!iframe) return;
+
+    try {
+      const result = await compareIframeToImage(iframe, targetImageUrl);
+      setScores((prev) => ({ ...prev, [modelId]: result }));
+    } catch (err) {
+      console.error(`Failed to compare ${modelId}:`, err);
+    }
+  };
+
+  const compareAllModels = async () => {
+    await Promise.all(
+      selectedModels
+        .filter((modelId) => outputs[modelId] && !errors[modelId])
+        .map(compareModel)
+    );
   };
 
   const toggleCode = (model: string) => {
@@ -90,6 +125,7 @@ export function ChallengeClient({ challenge, children }: ChallengeClientProps) {
     setIsLoading(true);
     setOutputs({});
     setErrors({});
+    setScores({});
 
     const { streams } = await generate(challenge.challengeId, selectedModels);
 
@@ -146,6 +182,15 @@ export function ChallengeClient({ challenge, children }: ChallengeClientProps) {
 
           <div className="flex items-center gap-3">
             <Button
+              onClick={compareAllModels}
+              disabled={isLoading || selectedModels.filter(m => outputs[m] && !errors[m]).length === 0}
+              size="sm"
+              variant="outline"
+            >
+              <IconScale className="size-4 mr-1.5" />
+              Evaluate
+            </Button>
+            <Button
               onClick={handleSubmit}
               disabled={isLoading || selectedModels.length === 0}
               size="sm"
@@ -168,8 +213,21 @@ export function ChallengeClient({ challenge, children }: ChallengeClientProps) {
               className="bg-white border-neutral-200 group w-[400px]"
             >
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium truncate">
+                <CardTitle className="text-sm font-medium truncate flex items-center gap-2">
                   {modelId.split("/")[1]}
+                  {scores[modelId] && (
+                    <span
+                      className={`text-xs font-semibold px-1.5 py-0.5 rounded ${
+                        scores[modelId].score >= 99
+                          ? "bg-green-100 text-green-700"
+                          : scores[modelId].score >= 90
+                            ? "bg-yellow-100 text-yellow-700"
+                            : "bg-red-100 text-red-700"
+                      }`}
+                    >
+                      {scores[modelId].score.toFixed(1)}%
+                    </span>
+                  )}
                 </CardTitle>
                 <CardAction className="flex items-center gap-1">
                   {outputs[modelId] && (
@@ -209,7 +267,8 @@ export function ChallengeClient({ challenge, children }: ChallengeClientProps) {
                       {outputs[modelId]}
                     </pre>
                   ) : outputs[modelId] ? (
-                    <IsolatedContent
+                    <IframePreview
+                      ref={(el) => { iframeRefs.current[modelId] = el; }}
                       htmlContent={outputs[modelId]}
                       className="w-full h-full bg-white"
                     />

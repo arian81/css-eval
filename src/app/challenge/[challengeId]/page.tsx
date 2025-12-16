@@ -21,7 +21,7 @@ export default async function ChallengePage({
   const imageUrl = `/challenges/${challenge.imageFile}.png`;
 
   return (
-    <ChallengeClient challenge={challenge}>
+    <ChallengeClient challenge={challenge} targetImageUrl={imageUrl}>
       <TargetCard imageUrl={imageUrl} challengeName={challenge.name} />
     </ChallengeClient>
   );

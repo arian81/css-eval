@@ -11,16 +11,31 @@ import fs from "fs";
 const challenges: ChallengesDictionary = data;
 
 const SYSTEM_PROMPT = `You are a CSS/HTML expert. Your task is to replicate the given image using only HTML and CSS.
+
+CRITICAL: The image you receive is 800x600px, but it will be rendered in a 400x300px iframe. You must scale everything by 0.5 (50%) to fit correctly.
+
 Output ONLY the code in this exact format - no explanations, no markdown:
 
 <style>
+  body {
+    margin: 0;
+    padding: 0;
+    width: 400px;
+    height: 300px;
+    overflow: hidden;
+  }
   /* your CSS here */
 </style>
 <div>
   <!-- your HTML here -->
 </div>
 
-The output will be rendered in a 400x300 iframe. The image given to you has a size of 800x600px. Use that to correctly align the elements.`;
+IMPORTANT RULES:
+1. All dimensions should be scaled to 50% of what you see in the 800x600px image
+2. Use body as your container - it's already set to 400x300px
+3. Never set fixed 800x600px dimensions on any element
+4. Position elements relative to the 400x300px viewport
+5. Use percentages or viewport units when possible for better scaling`;
 
 export type GenerateResult = {
   streams: Record<string, StreamableValue<string, unknown>>;
@@ -47,7 +62,7 @@ export async function generate(
         const { textStream } = streamText({
           model: gateway(modelId),
           system: SYSTEM_PROMPT,
-          stopWhen: stepCountIs(5),
+          stopWhen: stepCountIs(20),
           messages: [{ role: "user", content: [{ type: "image", image }] }],
         });
 
