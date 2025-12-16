@@ -27,6 +27,8 @@ import type { Challenge } from "@packages/cssbattle-scraper/src/types";
 import { readStreamableValue } from "@ai-sdk/rsc";
 import { generate } from "../../actions";
 import { SUPPORTED_MODELS, type SupportedModel } from "../../types";
+import challengesData from "@/data/challenges.json";
+import type { ChallengesDictionary } from "@packages/cssbattle-scraper/src/types";
 import {
   IconX,
   IconCode,
@@ -46,9 +48,11 @@ interface ChallengeClientProps {
   children: React.ReactNode;
 }
 
+const challenges: ChallengesDictionary = challengesData;
+const challengeIds = Object.keys(challenges);
+
 export function ChallengeClient({ challenge, targetImageUrl, children }: ChallengeClientProps) {
   const router = useRouter();
-
   const [selectedModels, setSelectedModels] = React.useState<SupportedModel[]>([]);
   const [outputs, setOutputs] = React.useState<Record<string, string>>({});
   const [errors, setErrors] = React.useState<Record<string, string>>({});
@@ -119,6 +123,11 @@ export function ChallengeClient({ challenge, targetImageUrl, children }: Challen
     setShowCode((prev) => ({ ...prev, [model]: !prev[model] }));
   };
 
+  const goToRandomChallenge = () => {
+    const randomId = challengeIds[Math.floor(Math.random() * challengeIds.length)];
+    router.push(`/challenge/${randomId}`);
+  };
+
   const handleSubmit = async () => {
     if (selectedModels.length === 0) return;
 
@@ -175,7 +184,7 @@ export function ChallengeClient({ challenge, targetImageUrl, children }: Challen
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => router.push("/")}
+              onClick={goToRandomChallenge}
               className="text-neutral-500 hover:text-neutral-900"
             >
               <IconRefresh className="size-4" />
