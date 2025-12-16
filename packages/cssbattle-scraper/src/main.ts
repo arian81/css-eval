@@ -19,6 +19,13 @@ for (const item of validatedItems.data) {
   challengesDictionary[item.challengeId] = item;
 }
 
-fs.writeFileSync("./src/challenges.json", JSON.stringify(challengesDictionary, null, 2));
-fs.cpSync("./src/challenges.json", "../../src/data/challenges.json", {recursive: true})
-fs.cpSync("./storage/key_value_stores/images", "../../public/challenges", {recursive: true})
+fs.writeFileSync(
+  "./src/challenges.json",
+  JSON.stringify(challengesDictionary, null, 2),
+);
+fs.cpSync("./src/challenges.json", "../../src/data/challenges.json", {
+  recursive: true,
+});
+fs.cpSync("./storage/key_value_stores/images", "../../public/challenges", {
+  recursive: true,
+});

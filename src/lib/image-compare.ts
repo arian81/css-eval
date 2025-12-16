@@ -13,7 +13,7 @@ export interface CompareResult {
 async function captureIframe(
   iframe: HTMLIFrameElement,
   width: number,
-  height: number
+  height: number,
 ): Promise<ImageData> {
   const doc = iframe.contentDocument;
   if (!doc || !doc.body) {
@@ -45,7 +45,7 @@ async function captureIframe(
 async function loadImageAsData(
   imageUrl: string,
   width: number,
-  height: number
+  height: number,
 ): Promise<ImageData> {
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -79,7 +79,7 @@ async function loadImageAsData(
 function compareImageData(
   imgData1: ImageData,
   imgData2: ImageData,
-  generateDiff = false
+  generateDiff = false,
 ): CompareResult {
   const data1 = imgData1.data;
   const data2 = imgData2.data;
@@ -137,7 +137,11 @@ function compareImageData(
     matchingPixels,
     totalPixels,
     diffImageData: diffData
-      ? new ImageData(diffData as ImageDataArray, imgData1.width, imgData1.height)
+      ? new ImageData(
+          diffData as ImageDataArray,
+          imgData1.width,
+          imgData1.height,
+        )
       : undefined,
   };
 }
@@ -151,7 +155,7 @@ export async function compareIframeToImage(
   targetImageUrl: string,
   width = 400,
   height = 300,
-  generateDiff = false
+  generateDiff = false,
 ): Promise<CompareResult> {
   const [iframeData, targetData] = await Promise.all([
     captureIframe(iframe, width, height),

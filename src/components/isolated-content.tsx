@@ -5,7 +5,10 @@ interface IsolatedContentProps {
   className?: string;
 }
 
-export function IsolatedContent({ htmlContent, className }: IsolatedContentProps) {
+export function IsolatedContent({
+  htmlContent,
+  className,
+}: IsolatedContentProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -22,4 +25,3 @@ export function IsolatedContent({ htmlContent, className }: IsolatedContentProps
 
   return <div ref={containerRef} className={className} />;
 }
-

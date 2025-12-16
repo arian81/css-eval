@@ -8,7 +8,6 @@ export const PageTypes = {
 
 export type PageType = (typeof PageTypes)[keyof typeof PageTypes];
 
-
 export interface MonthlyChallengePageURL {
   url: string;
   label: PageType;

@@ -28,4 +28,3 @@ export function TargetCard({ imageUrl, challengeName }: TargetCardProps) {
     </Card>
   );
 }
-

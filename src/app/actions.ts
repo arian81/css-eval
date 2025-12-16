@@ -43,11 +43,11 @@ export type GenerateResult = {
 
 export async function generate(
   challengeId: string,
-  models: SupportedModel[]
+  models: SupportedModel[],
 ): Promise<GenerateResult> {
   const challenge = challenges[challengeId];
   const imageBuffer = fs.readFileSync(
-    `public/challenges/${challenge.imageFile}.png`
+    `public/challenges/${challenge.imageFile}.png`,
   );
   const image = imageBuffer.toString("base64");
 

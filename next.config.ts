@@ -5,9 +5,9 @@ const nextConfig: NextConfig = {
   images: {
     localPatterns: [
       {
-        pathname: '/challenges/**',
-      }
-    ]
+        pathname: "/challenges/**",
+      },
+    ],
   },
 };
 

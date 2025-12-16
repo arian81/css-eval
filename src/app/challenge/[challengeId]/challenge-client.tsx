@@ -37,10 +37,13 @@ import {
   IconRefresh,
   IconPlus,
   IconScale,
+  IconBrandGithub,
 } from "@tabler/icons-react";
-import { IframePreview, type IframePreviewHandle } from "@/components/iframe-preview";
+import {
+  IframePreview,
+  type IframePreviewHandle,
+} from "@/components/iframe-preview";
 import { compareIframeToImage, type CompareResult } from "@/lib/image-compare";
-
 
 interface ChallengeClientProps {
   challenge: Challenge;
@@ -51,9 +54,15 @@ interface ChallengeClientProps {
 const challenges: ChallengesDictionary = challengesData;
 const challengeIds = Object.keys(challenges);
 
-export function ChallengeClient({ challenge, targetImageUrl, children }: ChallengeClientProps) {
+export function ChallengeClient({
+  challenge,
+  targetImageUrl,
+  children,
+}: ChallengeClientProps) {
   const router = useRouter();
-  const [selectedModels, setSelectedModels] = React.useState<SupportedModel[]>([]);
+  const [selectedModels, setSelectedModels] = React.useState<SupportedModel[]>(
+    [],
+  );
   const [outputs, setOutputs] = React.useState<Record<string, string>>({});
   const [errors, setErrors] = React.useState<Record<string, string>>({});
   const [showCode, setShowCode] = React.useState<Record<string, boolean>>({});
@@ -62,14 +71,16 @@ export function ChallengeClient({ challenge, targetImageUrl, children }: Challen
   const [mounted, setMounted] = React.useState(false);
   const [comboboxOpen, setComboboxOpen] = React.useState(false);
 
-  const iframeRefs = React.useRef<Record<string, IframePreviewHandle | null>>({});
+  const iframeRefs = React.useRef<Record<string, IframePreviewHandle | null>>(
+    {},
+  );
 
   React.useEffect(() => {
     setMounted(true);
   }, []);
 
   const availableModels = SUPPORTED_MODELS.filter(
-    (m) => !selectedModels.includes(m)
+    (m) => !selectedModels.includes(m),
   );
 
   const addModel = (model: SupportedModel) => {
@@ -115,7 +126,7 @@ export function ChallengeClient({ challenge, targetImageUrl, children }: Challen
     await Promise.all(
       selectedModels
         .filter((modelId) => outputs[modelId] && !errors[modelId])
-        .map(compareModel)
+        .map(compareModel),
     );
   };
 
@@ -124,7 +135,8 @@ export function ChallengeClient({ challenge, targetImageUrl, children }: Challen
   };
 
   const goToRandomChallenge = () => {
-    const randomId = challengeIds[Math.floor(Math.random() * challengeIds.length)];
+    const randomId =
+      challengeIds[Math.floor(Math.random() * challengeIds.length)];
     router.push(`/challenge/${randomId}`);
   };
 
@@ -136,7 +148,6 @@ export function ChallengeClient({ challenge, targetImageUrl, children }: Challen
     setErrors({});
     setScores({});
 
-    
     const { streams } = await generate(challenge.challengeId, selectedModels);
 
     const consumeStream = async (modelId: string) => {
@@ -150,7 +161,8 @@ export function ChallengeClient({ challenge, targetImageUrl, children }: Challen
           }
         }
       } catch (err) {
-        const baseMessage = err instanceof Error ? err.message : "Unknown error";
+        const baseMessage =
+          err instanceof Error ? err.message : "Unknown error";
         const message = `${baseMessage}(Most likely because this model does not support image inputs.)`;
         setErrors((prev) => ({ ...prev, [modelId]: message }));
       }
@@ -167,7 +179,7 @@ export function ChallengeClient({ challenge, targetImageUrl, children }: Challen
       acc[provider].push(model);
       return acc;
     },
-    {} as Record<string, SupportedModel[]>
+    {} as Record<string, SupportedModel[]>,
   );
 
   return (
@@ -178,9 +190,7 @@ export function ChallengeClient({ challenge, targetImageUrl, children }: Challen
             <h1 className="text-lg font-semibold tracking-tight">
               CSS Battle Eval
             </h1>
-            <span className="text-sm text-neutral-500">
-              {challenge.name}
-            </span>
+            <span className="text-sm text-neutral-500">{challenge.name}</span>
             <Button
               variant="ghost"
               size="sm"
@@ -194,7 +204,11 @@ export function ChallengeClient({ challenge, targetImageUrl, children }: Challen
           <div className="flex items-center gap-3">
             <Button
               onClick={compareAllModels}
-              disabled={isLoading || selectedModels.filter(m => outputs[m] && !errors[m]).length === 0}
+              disabled={
+                isLoading ||
+                selectedModels.filter((m) => outputs[m] && !errors[m])
+                  .length === 0
+              }
               size="sm"
               variant="outline"
             >
@@ -215,7 +229,13 @@ export function ChallengeClient({ challenge, targetImageUrl, children }: Challen
       </header>
 
       <main className="max-w-[1800px] mx-auto p-6">
-        <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fit, 400px)", justifyContent: "center" }}>
+        <div
+          className="grid gap-4"
+          style={{
+            gridTemplateColumns: "repeat(auto-fit, 400px)",
+            justifyContent: "center",
+          }}
+        >
           {children}
 
           {selectedModels.map((modelId) => (
@@ -279,7 +299,9 @@ export function ChallengeClient({ challenge, targetImageUrl, children }: Challen
                     </pre>
                   ) : outputs[modelId] ? (
                     <IframePreview
-                      ref={(el) => { iframeRefs.current[modelId] = el; }}
+                      ref={(el) => {
+                        iframeRefs.current[modelId] = el;
+                      }}
                       htmlContent={outputs[modelId]}
                       className="w-full h-full bg-white"
                     />
@@ -315,22 +337,24 @@ export function ChallengeClient({ challenge, targetImageUrl, children }: Challen
                           <CommandInput placeholder="Search models..." />
                           <CommandList className="max-h-[300px]">
                             <CommandEmpty>No model found.</CommandEmpty>
-                            {Object.entries(modelsByProvider).map(([provider, models]) => (
-                              <CommandGroup key={provider} heading={provider}>
-                                {models.map((model) => (
-                                  <CommandItem
-                                    key={model}
-                                    value={model}
-                                    onSelect={() => {
-                                      addModel(model);
-                                      setComboboxOpen(false);
-                                    }}
-                                  >
-                                    {model.split("/")[1]}
-                                  </CommandItem>
-                                ))}
-                              </CommandGroup>
-                            ))}
+                            {Object.entries(modelsByProvider).map(
+                              ([provider, models]) => (
+                                <CommandGroup key={provider} heading={provider}>
+                                  {models.map((model) => (
+                                    <CommandItem
+                                      key={model}
+                                      value={model}
+                                      onSelect={() => {
+                                        addModel(model);
+                                        setComboboxOpen(false);
+                                      }}
+                                    >
+                                      {model.split("/")[1]}
+                                    </CommandItem>
+                                  ))}
+                                </CommandGroup>
+                              ),
+                            )}
                           </CommandList>
                         </Command>
                       </PopoverContent>
@@ -340,14 +364,39 @@ export function ChallengeClient({ challenge, targetImageUrl, children }: Challen
                       <IconPlus className="size-8 text-neutral-400" />
                     </div>
                   )}
-                  <p className="text-sm text-neutral-500">Add a model to compare</p>
+                  <p className="text-sm text-neutral-500">
+                    Add a model to compare
+                  </p>
                 </div>
               </div>
             </CardContent>
           </Card>
         </div>
       </main>
+      <aside className="fixed right-4 top-1/2 -translate-y-1/2 z-20">
+        <div className="flex flex-col items-center gap-5">
+          <a
+            href="https://github.com/arian81/css-eval"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-neutral-500 hover:text-neutral-900 transition-colors"
+          >
+            <IconBrandGithub className="size-5" />
+          </a>
+          <div className="h-px w-8 bg-neutral-300" />
+          <span className="text-sm text-neutral-500 [writing-mode:vertical-lr] rotate-180">
+            Made by{" "}
+            <a
+              href="https://arian.gg"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-neutral-900 transition-colors"
+            >
+              arian.gg
+            </a>
+          </span>
+        </div>
+      </aside>
     </div>
   );
 }
-

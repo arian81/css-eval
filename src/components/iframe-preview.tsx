@@ -9,29 +9,31 @@ export interface IframePreviewHandle {
   getIframe: () => HTMLIFrameElement | null;
 }
 
-export const IframePreview = forwardRef<IframePreviewHandle, IframePreviewProps>(
-  function IframePreview({ htmlContent, className }, ref) {
-    const iframeRef = useRef<HTMLIFrameElement>(null);
-    const contentRef = useRef<string>("");
+export const IframePreview = forwardRef<
+  IframePreviewHandle,
+  IframePreviewProps
+>(function IframePreview({ htmlContent, className }, ref) {
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const contentRef = useRef<string>("");
 
-    useImperativeHandle(ref, () => ({
-      getIframe: () => iframeRef.current,
-    }));
+  useImperativeHandle(ref, () => ({
+    getIframe: () => iframeRef.current,
+  }));
 
-    useEffect(() => {
-      const iframe = iframeRef.current;
-      if (!iframe) return;
+  useEffect(() => {
+    const iframe = iframeRef.current;
+    if (!iframe) return;
 
-      // Skip if content hasn't changed
-      if (contentRef.current === htmlContent) return;
-      contentRef.current = htmlContent;
+    // Skip if content hasn't changed
+    if (contentRef.current === htmlContent) return;
+    contentRef.current = htmlContent;
 
-      const doc = iframe.contentDocument;
-      if (!doc) return;
+    const doc = iframe.contentDocument;
+    if (!doc) return;
 
-      // Write content directly to iframe document for instant sync
-      doc.open();
-      doc.write(`<!DOCTYPE html>
+    // Write content directly to iframe document for instant sync
+    doc.open();
+    doc.write(`<!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
@@ -49,17 +51,16 @@ export const IframePreview = forwardRef<IframePreviewHandle, IframePreviewProps>
 ${htmlContent}
 </body>
 </html>`);
-      doc.close();
-    }, [htmlContent]);
+    doc.close();
+  }, [htmlContent]);
 
-    return (
-      <iframe
-        ref={iframeRef}
-        className={className}
-        sandbox="allow-same-origin"
-        title="Preview"
-        style={{ border: "none" }}
-      />
-    );
-  }
-);
+  return (
+    <iframe
+      ref={iframeRef}
+      className={className}
+      sandbox="allow-same-origin"
+      title="Preview"
+      style={{ border: "none" }}
+    />
+  );
+});
