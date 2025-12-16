@@ -127,6 +127,7 @@ export function ChallengeClient({ challenge, targetImageUrl, children }: Challen
     setErrors({});
     setScores({});
 
+    
     const { streams } = await generate(challenge.challengeId, selectedModels);
 
     const consumeStream = async (modelId: string) => {
@@ -140,7 +141,8 @@ export function ChallengeClient({ challenge, targetImageUrl, children }: Challen
           }
         }
       } catch (err) {
-        const message = err instanceof Error ? err.message : "Unknown error";
+        const baseMessage = err instanceof Error ? err.message : "Unknown error";
+        const message = `${baseMessage}(Most likely because this model does not support image inputs.)`;
         setErrors((prev) => ({ ...prev, [modelId]: message }));
       }
     };

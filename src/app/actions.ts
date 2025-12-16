@@ -58,8 +58,13 @@ export async function generate(
     streams[modelId] = stream.value;
 
     (async () => {
+      let hasErrored = false;
       try {
         const { textStream } = streamText({
+          onError: (error) => {
+            hasErrored = true;
+            stream.error(error.error);
+          },
           model: gateway(modelId),
           system: SYSTEM_PROMPT,
           stopWhen: stepCountIs(20),
@@ -69,10 +74,14 @@ export async function generate(
         for await (const partial of textStream) {
           stream.update(partial);
         }
-        stream.done();
+        if (!hasErrored) {
+          stream.done();
+        }
       } catch (error) {
         console.error(`Error streaming from ${modelId}:`, error);
-        stream.error(error);
+        if (!hasErrored) {
+          stream.error(error);
+        }
       }
     })();
   }
